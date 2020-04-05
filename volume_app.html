@@ -1,0 +1,31 @@
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"></script>
+<script type='text/javascript' src='config_app.js'></script>
+
+<script type="text/javascript">
+  google.charts.load('current', {'packages':['corechart']})
+  google.charts.setOnLoadCallback(drawChart)
+	function drawChart() {
+		const nomics_key = config.nomics_key //replace with your key
+		const date_range = 'start=2017-01-01T00%3A00%3A00Z&end=2020-04-01T00%3A00%3A00Z'
+		const denomination_unit = 'BTC'
+		const chart_id = 'btc_chart_div'
+		var volume_data
+		var rows = []
+	  axios.get(`https://api.nomics.com/v1/volume/history?key=${nomics_key}&${date_range}&convert=${denomination_unit}`)
+	    .then(response => {
+	     	response.data.forEach(data_point => { rows.push([new Date(data_point.timestamp), parseInt(data_point.volume)]) })
+	      var data = new google.visualization.DataTable()
+	      data.addColumn('date', 'time');
+	      data.addColumn('number', 'volume');
+	      data.addRows(rows)
+	    
+	      var chart = new google.visualization.LineChart(document.getElementById(chart_id))
+	      chart.draw(data, {hAxis:{title:'Date'},vAxis:{title: denomination_unit}})
+	    })
+	    .catch(error => console.log(error))
+		}
+</script>
+
+<div> Casey's Global Volume Chart (using Nomics API) </div>
+<div id="btc_chart_div"></div>
