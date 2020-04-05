@@ -1,18 +1,19 @@
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"></script>
-<script type='text/javascript' src='config_app.js'></script>
+<!-- <script type='text/javascript' src='config_app.js'></script> -->
 
 <script type="text/javascript">
   google.charts.load('current', {'packages':['corechart']})
   google.charts.setOnLoadCallback(drawChart)
 	function drawChart() {
-		const nomics_key = config.nomics_key //replace with your key
+		const nomics_key = '32c7a9ad5935f479dff31c79a3f6db31' // TO DO: replce with config.nomics_key
 		const date_range = 'start=2017-01-01T00%3A00%3A00Z&end=2020-04-01T00%3A00%3A00Z'
 		const denomination_unit = 'BTC'
 		const chart_id = 'btc_chart_div'
 		var volume_data
 		var rows = []
-	  axios.get(`https://api.nomics.com/v1/volume/history?key=${nomics_key}&${date_range}&convert=${denomination_unit}`)
+		var url = `https://cors-anywhere.herokuapp.com/https://api.nomics.com/v1/volume/history?key=${nomics_key}&${date_range}&convert=${denomination_unit}`
+	  	axios.get(url)
 	    .then(response => {
 	     	response.data.forEach(data_point => { rows.push([new Date(data_point.timestamp), parseInt(data_point.volume)]) })
 	      var data = new google.visualization.DataTable()
