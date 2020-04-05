@@ -4,29 +4,34 @@
 
 <script type="text/javascript">
   google.charts.load('current', {'packages':['corechart']})
-  google.charts.setOnLoadCallback(drawChart)
-	function drawChart() {
+  google.charts.setOnLoadCallback(init)
+	function init() {
+		drawChart('BTC', 'btc_chart_div')
+		drawChart('USD', 'usd_chart_div')
+	}
+	function drawChart(denomination_unit, chart_id) {
 		const nomics_key = '32c7a9ad5935f479dff31c79a3f6db31' // TO DO: replce with config.nomics_key
 		const date_range = 'start=2017-01-01T00%3A00%3A00Z&end=2020-04-01T00%3A00%3A00Z'
-		const denomination_unit = 'BTC'
-		const chart_id = 'btc_chart_div'
 		var volume_data
 		var rows = []
 		var url = `https://cors-anywhere.herokuapp.com/https://api.nomics.com/v1/volume/history?key=${nomics_key}&${date_range}&convert=${denomination_unit}`
-	  	axios.get(url)
-	    .then(response => {
-	     	response.data.forEach(data_point => { rows.push([new Date(data_point.timestamp), parseInt(data_point.volume)]) })
-	      var data = new google.visualization.DataTable()
-	      data.addColumn('date', 'time');
-	      data.addColumn('number', 'volume');
-	      data.addRows(rows)
-	    
-	      var chart = new google.visualization.LineChart(document.getElementById(chart_id))
-	      chart.draw(data, {hAxis:{title:'Date'},vAxis:{title: denomination_unit}})
-	    })
-	    .catch(error => console.log(error))
-		}
+  	
+  	axios.get(url)
+    .then(response => {
+     	response.data.forEach(data_point => { rows.push([new Date(data_point.timestamp), parseInt(data_point.volume)]) })
+      var data = new google.visualization.DataTable()
+      data.addColumn('date', 'time');
+      data.addColumn('number', 'volume');
+      data.addRows(rows)
+    
+      var chart = new google.visualization.LineChart(document.getElementById(chart_id))
+      chart.draw(data, {hAxis:{title:'Date'},vAxis:{title: denomination_unit,format: 'long'}})
+    })
+    .catch(error => console.log(error))
+	}
 </script>
 
-<div> Casey's Global Volume Chart (using Nomics API) </div>
+<h3> Casey's Global Crypto Volume Chart (using Nomics API) </h3>
+<h4> Recently, I have seen disturbingly different crypto volume charts. Now I am embarking on my own journey now to get to the bottom of it. </h4>
 <div id="btc_chart_div"></div>
+<div id="usd_chart_div"></div>
