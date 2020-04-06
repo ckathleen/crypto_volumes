@@ -4,7 +4,41 @@
   	<link href='https://fonts.googleapis.com/css?family=Comfortaa' rel='stylesheet'>
   	<style>
 			body {
-			    font-family: 'Comfortaa';font-size: 22px;
+		    font-family: 'Comfortaa';font-size: 22px;
+		    margin: 20px;
+			}
+			.loader {
+			  border: 16px solid #f3f3f3; /* Light grey */
+			  border-top: 16px solid MediumVioletRed; /* pink */
+			  border-radius: 50%;
+			  width: 20px;
+			  height: 20px;
+			  margin: 30px;
+			  animation: spin 2s linear infinite;
+			}
+
+			@keyframes spin {
+			  0% { transform: rotate(0deg); }
+			  100% { transform: rotate(360deg); }
+			}
+			#btc_chart_div {
+				display: flex;
+    		justify-content: center;
+    		height: 200px;
+			}
+			#usd_chart_div {
+				display: flex;
+    		justify-content: center;
+    		height: 200px;
+			}
+			h6 {
+				margin: 5px;
+			}
+			a { 
+				color: MediumVioletRed;
+			}
+			p {
+				font-size: 14px;
 			}
 		</style>
 	</head>
@@ -13,9 +47,17 @@
 		<h5> I have recently seen disturbingly different crypto volume charts. Due to such, I am embarking on my own journey to get to the bottom of it. </h5>
 		<br>
 		<div id="nomics">
-			<h6>Nomics Global Crypto Volume <a href='http://docs.nomics.com/#tag/Volume'>(docs)</a></h6>
-			<div id="btc_chart_div"></div>
-			<div id="usd_chart_div"></div>
+			<h5>Nomics Global Crypto Volume <a target="_blank" href='http://docs.nomics.com/#tag/Volume'>(docs)</a></h5>
+			<div id="btc_chart_div">
+				<div class="loader"></div>
+			</div>
+			<div id="usd_chart_div">
+				<div class="loader"></div>
+			</div>
+		</div>
+		<div id="coinmarketcap">
+			<h5>Coinmarketcap Global Volume <a target="_blank" href='http://coinmarketcap.com'>(docs)</a></h5>
+			<p>coming soon</p>
 		</div>
 		<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"></script>
@@ -43,7 +85,13 @@
 	      data.addRows(rows)
 	    
 	      var chart = new google.visualization.LineChart(document.getElementById(chart_id))
-	      chart.draw(data, {hAxis:{title:'Date'},vAxis:{title: denomination_unit,format: 'long'}})
+	      var options = {
+	      	hAxis:{title:'Date'},
+	      	vAxis:{title: denomination_unit, format: 'long'},
+	      	animation: {startup: true},
+	      	colors:['MediumVioletRed','purple'],
+	      }
+	      chart.draw(data, options)
 	    })
 	    .catch(error => console.log(error))
 		}
