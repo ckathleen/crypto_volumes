@@ -40,6 +40,11 @@
 			p {
 				font-size: 14px;
 			}
+
+			#nomics-code {
+				font-size: 14px;
+				align-self: left;
+			}
 		</style>
 	</head>
 	<body>
@@ -54,11 +59,34 @@
 			<div id="usd_chart_div">
 				<div class="loader"></div>
 			</div>
+			<div id='nomics-code'>
+				<pre class="prettyprint">
+					
+	// This script saves a csv file of volume and is run with nodeJS. 
+	// To execute: npm install && node volume_script.js
+
+	const axios = require('axios').default
+	const config = require('./config_script.js')
+	const nomics_key = config.nomics_key
+	const fs = require('fs')
+	const date_range = 'start=2017-01-01T00%3A00%3A00Z&end=2020-04-01T00%3A00%3A00Z'
+	var volume_data
+
+	axios.get(`https://api.nomics.com/v1/volume/history?key=${nomics_key}&${date_range}&convert=BTC&format=csv`)
+	  .then(response => volume_data = response.data)
+	  .catch(error => console.log(error))
+	  .then(() => {
+	    fs.writeFile('volume_data.csv', volume_data, err => {
+	      err ? console.log('error saving') : console.log('File saved!')
+	    })
+	  })
+				</pre>
 		</div>
 		<div id="coinmarketcap">
 			<h5>Coinmarketcap Global Volume <a target="_blank" href='http://coinmarketcap.com'>(docs)</a></h5>
 			<p>coming soon</p>
 		</div>
+		<script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
 		<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"></script>
 		<!-- <script type='text/javascript' src='config_app.js'></script> -->
