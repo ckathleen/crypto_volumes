@@ -21,16 +21,16 @@
 			  0% { transform: rotate(0deg); }
 			  100% { transform: rotate(360deg); }
 			}
-			#btc_chart_div {
+			.chart {
 				display: flex;
     		justify-content: center;
     		height: 200px;
 			}
-			#usd_chart_div {
-				display: flex;
-    		justify-content: center;
-    		height: 200px;
-			}
+      .long-chart {
+        display: flex;
+        justify-content: center;
+        height: 600px;
+      }
 			h6 {
 				margin: 5px;
 			}
@@ -51,12 +51,14 @@
 		<h4> Casey's Crypto Volume Exploration </h4>
 		<h5> I have recently seen disturbingly different crypto volume charts. Due to such, I am embarking on my own journey to get to the bottom of it. </h5>
 		<br>
+
 		<div id="nomics">
 			<h5>Nomics Global Crypto Volume <a target="_blank" href='http://docs.nomics.com/#tag/Volume'>(docs)</a></h5>
-			<div id="btc_chart_div">
+			<p> This is spot volume, normalized to USD using daily prices for all crypto markets.</p>
+			<div id="nomics_global_vol_in_btc" class='chart'>
 				<div class="loader"></div>
 			</div>
-			<div id="usd_chart_div">
+			<div id="nomics_global_vol_in_usd" class='chart'>
 				<div class="loader"></div>
 			</div>
 			<div id='nomics-code'>
@@ -80,12 +82,26 @@
 	      err ? console.log('error saving') : console.log('File saved!')
 	    })
 	  })
-				</pre>
+		  </pre>
 		</div>
-		<div id="coinmarketcap">
-			<h5>Coinmarketcap Global Volume <a target="_blank" href='http://coinmarketcap.com'>(docs)</a></h5>
-			<p>coming soon</p>
+
+		<div id="bitwise">
+			<h5>Bitwise Top 10 BTC Volume <a target="_blank" href='https://www.bitcointradevolume.com/'>(website)</a></h5>
+      <p> This volume only includes BTC volume against fiat currencies and popular stablecoins (USD, EUR, JPY, GBP, USDT, USDC, PAX) on the Bitwise top 10 exchanges--Binance, Coinbase Pro, Kraken, Bitstamp, Bitfinex, BitFlyer, Poloniex, Gemini, Bittrex, and itBit. <br>
+			<br>
+			Note: This data was generously provide by the BitWise team. Thank you! </p>
+			<div id="bitwise_aggregated_vol_in_usd" class='chart'>
+        <div class="loader"></div>
+      </div>
+      <div id="bitwise_top_10_vol_in_usd" class='long-chart'>
+        <div class="loader"></div>
+      </div>
 		</div>
+
+    <div id="coinmarketcap">
+      <h5>Coinmarketcap Global Volume <a target="_blank" href='http://coinmarketcap.com'>(docs)</a></h5>
+      <p>coming soon</p>
+    </div>
 		<script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
 		<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"></script>
@@ -94,10 +110,12 @@
 	  google.charts.load('current', {'packages':['corechart']})
 	  google.charts.setOnLoadCallback(init)
 		function init() {
-			drawChart('BTC', 'btc_chart_div')
-			drawChart('USD', 'usd_chart_div')
+			drawNomicsChart('BTC', 'nomics_global_vol_in_btc')
+			drawNomicsChart('USD', 'nomics_global_vol_in_usd')
+      drawBitwiseChart('https://docs.google.com/spreadsheets/d/1xCT6mSNZ285pQreEHdblb1q1tYrlf_7DmXmARrRSsWE/gviz/tq?sheet=separate', 'separate')
+      drawBitwiseChart('https://docs.google.com/spreadsheets/d/1xCT6mSNZ285pQreEHdblb1q1tYrlf_7DmXmARrRSsWE/gviz/tq?sheet=aggregated', 'aggregated')
 		}
-		function drawChart(denomination_unit, chart_id) {
+		function drawNomicsChart(denomination_unit, chart_id) {
 			const nomics_key = '32c7a9ad5935f479dff31c79a3f6db31' // TO DO: replce with config.nomics_key
 			const date_range = 'start=2017-01-01T00%3A00%3A00Z&end=2020-04-01T00%3A00%3A00Z'
 			var volume_data
@@ -117,12 +135,43 @@
 	      	hAxis:{title:'Date'},
 	      	vAxis:{title: denomination_unit, format: 'long'},
 	      	animation: {startup: true},
-	      	colors:['MediumVioletRed','purple'],
+	      	colors:['MediumVioletRed','Purple', 'DeepPink', 'HotPink', 'Coral', 'Salmon', 'Plum', 'Orchid', 'Magenta', 'DarkOrchid'],
 	      }
 	      chart.draw(data, options)
 	    })
 	    .catch(error => console.log(error))
 		}
+
+    function drawBitwiseChart (url, type) {
+      console.log('URL::: ', url, type)
+      var query = new google.visualization.Query(url)
+      var cb = (type == 'separate') ? handleQueryResBitwiseSeparate : handleQueryResBitwiseAggregated
+      query.send(cb)
+    }
+
+    function handleQueryResBitwiseSeparate(response) {
+      var bitwise_data = response.getDataTable()
+      var chart = new google.visualization.LineChart(document.getElementById('bitwise_top_10_vol_in_usd'))
+        var options = {
+          hAxis:{title:'Date'},
+          vAxis:{title: 'USD', format: 'long'},
+          animation: {startup: true},
+          colors:['IndianRed', 'MediumVioletRed', 'Orange', 'GoldenRod', 'DarkOliveGreen',  'MediumAquaMarine', 'CadetBlue', 'LightSkyBlue', 'violet', 'DarkOrchid', 'Red'],
+        }
+        chart.draw(bitwise_data, options)
+    }
+
+    function handleQueryResBitwiseAggregated(response) {
+      var bitwise_data = response.getDataTable()
+      var chart = new google.visualization.LineChart(document.getElementById('bitwise_aggregated_vol_in_usd'))
+        var options = {
+          hAxis:{title:'Date'},
+          vAxis:{title: 'USD', format: 'long'},
+          animation: {startup: true},
+          colors:['MediumVioletRed'],
+        }
+        chart.draw(bitwise_data, options)
+    }
 	</script>
 	</body>
 </html>
